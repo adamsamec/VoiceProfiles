@@ -318,6 +318,16 @@ class VoiceProfiles:
 	def getOtherSettings(self):
 		return self.otherSettings.copy()
 
+	def getDefaultProfileName(self, synthId, voiceId):
+		synthName = self.getSynthNameById(synthId)
+		voiceName = self.getVoiceNameById(synthId, voiceId)
+		if synthName == None or voiceName == None:
+			# Translators: Default profile name for unknown voice
+			profileName = _("Unknown")
+		else:
+			profileName = synthName if synthId == SilenceSynthDriver.name else f"{voiceName} ({synthName})"
+		return profileName
+
 	def applyVoiceProfileSettings(self, voiceProfileSettings):
 		self.voiceProfileSettings = voiceProfileSettings.copy()
 		self.changeVoiceOnly(self.currentVoiceProfileSettingsIndex, announceChange=False)

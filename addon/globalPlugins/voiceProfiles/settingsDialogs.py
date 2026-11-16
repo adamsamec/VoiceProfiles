@@ -137,38 +137,47 @@ class AddVoiceProfileDialog(wx.Dialog):
 		synthsWithVoices = self.app.getSynthsWithVoices()
 		self.synthsIds = [synthWithVoices["id"] for synthWithVoices in synthsWithVoices]
 		synthsNames = [synthWithVoices["name"] for synthWithVoices in synthsWithVoices]
-		# Translators: Label for the synthesizers combobox in the add voice dialog
+		# Translators: Label for the synthesizers combobox in the add voice profile dialog
 		self.synthsComboBox = sHelper.addLabeledControl(_("Synthesizer"), wx.Choice, choices=synthsNames)
 		self.synthsComboBox.Select(0)
 		self.synthsComboBox.Bind(wx.EVT_CHOICE, self.onSynthChange)
 		self.synthsComboBox.SetFocus()
 
-		# Translators: Label for the voices combobox in the add voice dialog
+		# Translators: Label for the voices combobox in the add voice profile dialog
 		self.voicesComboBox = sHelper.addLabeledControl(_("Voice"), wx.Choice, choices=[])
+		self.voicesComboBox.Bind(wx.EVT_CHOICE, self.onVoiceChange)
+
+		# Translators: Label for the profile name text field in the add voice profile dialog
+		self.profileNameTextField = sHelper.addLabeledControl(_("Profile name"), wx.TextCtrl)
 
 		# Buttons group
 		buttons = gui.guiHelper.ButtonHelper(wx.VERTICAL)
 
-		# Translators: Label for the add button in the add voice dialog
+		# Translators: Label for the add button in the add voice profile dialog
 		self.addButton = buttons.addButton(self, label=_("Add"))
 		self.addButton.Bind(wx.EVT_BUTTON, self.onAddButtonClick)
 		self.addButton.SetDefault()
 
-		# Translators: Label for the cancel button in the add voice dialog
+		# Translators: Label for the cancel button in the add voice profile dialog
 		cancelButton = buttons.addButton(self, label=_("Cancel"))
 		cancelButton.Bind(wx.EVT_BUTTON, self.onCancelButtonClick)
-		
-		self.updateVoiceComboBox()
-		
+
+		self.updateVoicesComboBox()
+		self.setProfileNameTextBoxToDefault()
+
 		sHelper.addItem(buttons)
 		mainSizer.Add(sHelper.sizer, border=10, flag=wx.ALL)
 		mainSizer.Fit(self)
 		self.SetSizer(mainSizer)
 
 	def onSynthChange(self, event):
-		self.updateVoiceComboBox()
+		self.updateVoicesComboBox()
+		self.setProfileNameTextBoxToDefault()
 
-	def updateVoiceComboBox(self):
+	def onVoiceChange(self, event):
+		self.setProfileNameTextBoxToDefault()
+
+	def updateVoicesComboBox(self):
 		comboBoxItems = []
 		synthSelection = self.synthsComboBox.GetSelection()
 		synthId = self.synthsIds[synthSelection]		
@@ -191,6 +200,12 @@ class AddVoiceProfileDialog(wx.Dialog):
 				self.addButton.Enable()
 		self.voicesComboBox.SetItems(comboBoxItems)
 		self.voicesComboBox.Select(0)
+
+	def setProfileNameTextBoxToDefault(self):
+		synthId = self.synthsIds[self.synthsComboBox.GetSelection()]
+		voiceId = self.voicesIds[self.voicesComboBox.GetSelection()]
+		profileName = self.app.getDefaultProfileName(synthId, voiceId)
+		self.profileNameTextField.SetValue(profileName)
 
 	def charHook(self, event):
 		key = event.GetKeyCode()
