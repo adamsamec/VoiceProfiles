@@ -35,9 +35,9 @@ class SelectVoiceProfileDialog(wx.Dialog):
 		mainSizer = wx.BoxSizer(wx.VERTICAL)
 		sHelper = gui.guiHelper.BoxSizerHelper(self, wx.VERTICAL)
 
-		# Translators: Label for the voices listbox in the Select a voice dialog
-		self.voicesListBox = sHelper.addLabeledControl(_("Voices"), wx.ListBox, choices=[])
-		self.initVoicesListBox()
+		# Translators: Label for the voice profiles listbox in the Select a voice dialog
+		self.voiceProfilesListBox = sHelper.addLabeledControl(_("Voice profiles"), wx.ListBox, choices=[])
+		self.initVoiceProfilesListBox()
 
 		# Buttons group
 		buttons = gui.guiHelper.ButtonHelper(wx.VERTICAL)
@@ -56,15 +56,15 @@ class SelectVoiceProfileDialog(wx.Dialog):
 		mainSizer.Fit(self)
 		self.SetSizer(mainSizer)
 
-	def initVoicesListBox(self):
+	def initVoiceProfilesListBox(self):
 		listBoxItems = []
-		voiceSettings = self.app.getVoiceSettings()
-		for voiceSetting in voiceSettings:
-			synthName = self.app.getSynthNameById(voiceSetting["synthId"])
-			voiceName = self.app.getVoiceNameById(voiceSetting["synthId"], voiceSetting["voiceId"])
-			choice = synthName if voiceSetting["synthId"] == SilenceSynthDriver.name else f"{voiceName} ({synthName})"
+		voiceProfileSettings = self.app.getVoiceProfileSettings()
+		for voiceProfileSetting in voiceProfileSettings:
+			synthName = self.app.getSynthNameById(voiceProfileSetting["synthId"])
+			voiceName = self.app.getVoiceNameById(voiceProfileSetting["synthId"], voiceProfileSetting["voiceId"])
+			choice = synthName if voiceProfileSetting["synthId"] == SilenceSynthDriver.name else f"{voiceName} ({synthName})"
 			listBoxItems.append(choice)
-		self.voicesListBox.SetItems(listBoxItems)
+		self.voiceProfilesListBox.SetItems(listBoxItems)
 
 	def charHook(self, event):
 		key = event.GetKeyCode()
@@ -86,4 +86,4 @@ class SelectVoiceProfileDialog(wx.Dialog):
 
 	def onDestroy(self, event):
 		if self.doChangeVoice:
-			self.app.changeVoice(self.voicesListBox.GetSelection(), announceChange=False)
+			self.app.changeVoice(self.voiceProfilesListBox.GetSelection(), announceChange=False)

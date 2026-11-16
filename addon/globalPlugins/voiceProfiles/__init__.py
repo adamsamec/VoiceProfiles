@@ -31,19 +31,19 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
 	@scriptHandler.script(
 		gesture="kb:NVDA+Control+L",
-		# Translators: Switch to the next voice gesture description for the Input gestures settings dialog
-		description=_("Switches to the next voice."),
+		# Translators: Switch to the next voice profile gesture description for the Input gestures settings dialog
+		description=_("Switches to the next voice profile."),
 	)
-	def script_switchToNextVoice(self, gesture):
-		self.app.switchToNextVoice()
+	def script_switchToNextVoiceProfile(self, gesture):
+		self.app.switchToNextVoiceProfile()
 
 	@scriptHandler.script(
 		gesture="kb:NVDA+Control+Shift+L",
-		# Translators: Switch to the previous voice gesture description for the Input gestures settings dialog
-		description=_("Switches to the previous voice."),
+		# Translators: Switch to the previous voice profile gesture description for the Input gestures settings dialog
+		description=_("Switches to the previous voice profile."),
 	)
-	def script_switchToPrevVoice(self, gesture):
-		self.app.switchToPrevVoice()
+	def script_switchToPrevVoiceProfile(self, gesture):
+		self.app.switchToPrevVoiceProfile()
 
 	@scriptHandler.script(
 		gesture="kb:NVDA+Alt+V",

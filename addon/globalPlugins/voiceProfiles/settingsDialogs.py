@@ -41,87 +41,87 @@ class OptionsPanel(SettingsPanel):
 
 	def makeSettings(self, settingsSizer):
 		self.loadSettings()
-		self.isVoiceSettingsModified = False
+		self.isVoiceProfileSettingsModified = False
 
 		sHelper = gui.guiHelper.BoxSizerHelper(self, sizer=settingsSizer)
 
-		# Translators: Label for the voices listbox in the add-on settings
-		self.voicesListBox = sHelper.addLabeledControl(_("Voices"), wx.ListBox, choices=[])
-		self.updateVoicesListBox()
+		# Translators: Label for the voice profiles listbox in the add-on settings
+		self.voiceProfilesListBox = sHelper.addLabeledControl(_("Voice profiles"), wx.ListBox, choices=[])
+		self.updateVoiceProfilesListBox()
 		
 		# Buttons group
 		buttons = gui.guiHelper.ButtonHelper(wx.VERTICAL)
 
-		# Translators: Label for the add voice button in the add-on settings
-		self.addVoiceButton = buttons.addButton(self, label=_("Add voice"))
-		self.addVoiceButton.Bind(wx.EVT_BUTTON, self.onAddVoiceButtonClick)
+		# Translators: Label for the add button in the add-on settings
+		self.addButton = buttons.addButton(self, label=_("Add"))
+		self.addButton.Bind(wx.EVT_BUTTON, self.onAddButtonClick)
 
-		# Translators: Label for the remove voice button in the add-on settings
-		self.removeVoiceButton = buttons.addButton(self, label=_("Remove voice"))
-		self.removeVoiceButton.Bind(wx.EVT_BUTTON, self.onRemoveVoiceButtonClick)
+		# Translators: Label for the remove button in the add-on settings
+		self.removeButton = buttons.addButton(self, label=_("Remove"))
+		self.removeButton.Bind(wx.EVT_BUTTON, self.onRemoveButtonClick)
 		self.updateRemoveButtonState()
 
 		sHelper.addItem(buttons)
 
-		# Translators: Label for the update voice when NVDA's own speech settings change checkbox in the add-on settings
-		self.updateVoiceCheckbox = sHelper.addItem(wx.CheckBox(self, label=_("Update voice when NVDA's own speech settings change")))
-		self.updateVoiceCheckbox.SetValue(self.otherSettings["enableVoiceUpdateWhenNVDAsettingsChange"])
+		# Translators: Label for the update voice profile parameters when NVDA's own speech settings change checkbox in the add-on settings
+		self.updateVoiceProfileParametersCheckbox = sHelper.addItem(wx.CheckBox(self, label=_("Update voice profile parameters when NVDA's own speech settings change")))
+		self.updateVoiceProfileParametersCheckbox.SetValue(self.otherSettings["enableVoiceProfileUpdateWhenNVDAsettingsChange"])
 
 	def loadSettings(self):
-		self.app.cleanUpVoiceSettings()
-		self.voiceSettings = self.app.getVoiceSettings()
+		self.app.cleanUpVoiceProfileSettings()
+		self.voiceProfileSettings = self.app.getVoiceProfileSettings()
 		self.otherSettings = self.app.getOtherSettings()
 
-	def updateVoicesListBox(self, selectionIndex=0):
+	def updateVoiceProfilesListBox(self, selectionIndex=0):
 		listBoxItems = []
-		for voiceSetting in self.voiceSettings:
-			synthName = self.app.getSynthNameById(voiceSetting["synthId"])
-			voiceName = self.app.getVoiceNameById(voiceSetting["synthId"], voiceSetting["voiceId"])
-			choice = synthName if voiceSetting["synthId"] == SilenceSynthDriver.name else f"{voiceName} ({synthName})"
+		for voiceProfileSetting in self.voiceProfileSettings:
+			synthName = self.app.getSynthNameById(voiceProfileSetting["synthId"])
+			voiceName = self.app.getVoiceNameById(voiceProfileSetting["synthId"], voiceProfileSetting["voiceId"])
+			choice = synthName if voiceProfileSetting["synthId"] == SilenceSynthDriver.name else f"{voiceName} ({synthName})"
 			listBoxItems.append(choice)
-		self.voicesListBox.SetItems(listBoxItems)
+		self.voiceProfilesListBox.SetItems(listBoxItems)
 		if len(listBoxItems) > 0:
-			self.voicesListBox.SetSelection(selectionIndex)
+			self.voiceProfilesListBox.SetSelection(selectionIndex)
 
-	def addVoiceSetting(self, setting):
-		insertIndex = 0 if len(self.voiceSettings) == 0 else self.voicesListBox.GetSelection() + 1
-		self.voiceSettings.insert(insertIndex, setting)
-		self.updateVoicesListBox(insertIndex)
+	def addVoiceProfileSetting(self, setting):
+		insertIndex = 0 if len(self.voiceProfileSettings) == 0 else self.voiceProfilesListBox.GetSelection() + 1
+		self.voiceProfileSettings.insert(insertIndex, setting)
+		self.updateVoiceProfilesListBox(insertIndex)
 		self.updateRemoveButtonState()
-		self.isVoiceSettingsModified = True
+		self.isVoiceProfileSettingsModified = True
 
-	def onAddVoiceButtonClick(self, event):
-		addVoiceDialog = AddVoiceDialog(self, self.app)
-		addVoiceDialog.ShowModal()
+	def onAddButtonClick(self, event):
+		addVoiceProfileDialog = AddVoiceProfileDialog(self, self.app)
+		addVoiceProfileDialog.ShowModal()
 
-	def onRemoveVoiceButtonClick(self, event):
-		if len(self.voiceSettings) == 1:
-			ui.message(_("The last remaining voice cannot be removed"))
+	def onRemoveButtonClick(self, event):
+		if len(self.voiceProfileSettings) == 1:
+			ui.message(_("The last remaining voice profile cannot be removed"))
 			return
-		selectionIndex = self.voicesListBox.GetSelection()
-		del self.voiceSettings[selectionIndex]
-		newSelectionIndex = max(0, min(selectionIndex, len(self.voiceSettings) - 1))
-		self.updateVoicesListBox(newSelectionIndex)
-		self.isVoiceSettingsModified = True
+		selectionIndex = self.voiceProfilesListBox.GetSelection()
+		del self.voiceProfileSettings[selectionIndex]
+		newSelectionIndex = max(0, min(selectionIndex, len(self.voiceProfileSettings) - 1))
+		self.updateVoiceProfilesListBox(newSelectionIndex)
+		self.isVoiceProfileSettingsModified = True
 
 	def updateRemoveButtonState(self):
-		if len(self.voiceSettings) > 0:
-			self.removeVoiceButton.Enable()
+		if len(self.voiceProfileSettings) > 0:
+			self.removeButton.Enable()
 		else:
-			self.removeVoiceButton.Disable()
+			self.removeButton.Disable()
 
 	def onSave(self):
-		if self.isVoiceSettingsModified:
-			self.app.applyVoiceSettings(self.voiceSettings)
-			self.isVoiceSettingsModified = False
+		if self.isVoiceProfileSettingsModified:
+			self.app.applyVoiceProfileSettings(self.voiceProfileSettings)
+			self.isVoiceProfileSettingsModified = False
 
-		self.otherSettings["enableVoiceUpdateWhenNVDAsettingsChange"] = self.updateVoiceCheckbox.GetValue()
+		self.otherSettings["enableVoiceProfileUpdateWhenNVDAsettingsChange"] = self.updateVoiceProfileParametersCheckbox.GetValue()
 		self.app.applyOtherSettingsAndSave(self.otherSettings)
 
-class AddVoiceDialog(wx.Dialog):
+class AddVoiceProfileDialog(wx.Dialog):
 
 	def __init__(self, parent, app):
-		super().__init__(parent, title=_("Add voice"))
+		super().__init__(parent, title=_("Add voice profile"))
 		self.plugin = parent
 		self.app = app
 
@@ -200,11 +200,11 @@ class AddVoiceDialog(wx.Dialog):
 			event.Skip()
 
 	def onAddButtonClick(self, event):
-		voiceSetting = {
+		voiceProfileSetting = {
 			"synthId": self.synthsIds[self.synthsComboBox.GetSelection()],
 			"voiceId": self.voicesIds[self.voicesComboBox.GetSelection()],
 		}
-		self.plugin.addVoiceSetting(voiceSetting)
+		self.plugin.addVoiceProfileSetting(voiceProfileSetting)
 		self.close()
 
 	def onCancelButtonClick(self, event):
