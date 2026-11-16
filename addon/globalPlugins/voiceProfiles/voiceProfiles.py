@@ -464,6 +464,13 @@ class VoiceProfiles:
 				voiceProfileSetting[param] = getattr(synth, param)
 		return voiceProfileSetting
 
+	def limitTextField(self, textField):
+		value = textField.GetValue()
+		insertionPoint = textField.GetInsertionPoint()
+		if len(value) > consts.MAX_VOICE_PROFILE_NAME_LENGTH:
+			textField.SetValue(value[:consts.MAX_VOICE_PROFILE_NAME_LENGTH])
+			textField.SetInsertionPoint(insertionPoint)
+
 	def getConfig(self, key):
 		return config.conf["VoiceProfiles"][key]
 

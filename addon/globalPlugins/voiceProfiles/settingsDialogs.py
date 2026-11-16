@@ -149,6 +149,7 @@ class AddVoiceProfileDialog(wx.Dialog):
 
 		# Translators: Label for the profile name text field in the add voice profile dialog
 		self.profileNameTextField = sHelper.addLabeledControl(_("Profile name"), wx.TextCtrl)
+		self.profileNameTextField.Bind(wx.EVT_TEXT, self.onProfileNameChange)
 
 		# Buttons group
 		buttons = gui.guiHelper.ButtonHelper(wx.VERTICAL)
@@ -176,6 +177,9 @@ class AddVoiceProfileDialog(wx.Dialog):
 
 	def onVoiceChange(self, event):
 		self.setProfileNameTextBoxToDefault()
+
+	def onProfileNameChange(self, event):
+		self.app.limitTextField(self.profileNameTextField)
 
 	def updateVoicesComboBox(self):
 		comboBoxItems = []

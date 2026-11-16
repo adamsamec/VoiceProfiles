@@ -21,3 +21,4 @@ DEFAULT_PARAMS_VALUES = {
 	"rate": 50,
 	"rateBoost": 0
 }
+MAX_VOICE_PROFILE_NAME_LENGTH = 10
