@@ -231,3 +231,118 @@ class AddVoiceProfileDialog(wx.Dialog):
 
 	def close(self):
 		self.Destroy()
+
+
+class EditVoiceProfileDialog(wx.Dialog):
+
+	def __init__(self, parent, app):
+		super().__init__(parent, title=_("Edit voice profile"))
+		self.plugin = parent
+		self.app = app
+
+		self.Bind(wx.EVT_CHAR_HOOK, self.charHook)
+		self.addWidgets()
+
+	def addWidgets(self):
+		mainSizer = wx.BoxSizer(wx.VERTICAL)
+		sHelper = gui.guiHelper.BoxSizerHelper(self, wx.VERTICAL)
+
+		# Synth combobox
+		self.app.updateSynthsWithVoices()
+		synthsWithVoices = self.app.getSynthsWithVoices()
+		self.synthsIds = [synthWithVoices["id"] for synthWithVoices in synthsWithVoices]
+		synthsNames = [synthWithVoices["name"] for synthWithVoices in synthsWithVoices]
+		# Translators: Label for the synthesizers combobox in the edit voice profile dialog
+		self.synthsComboBox = sHelper.addLabeledControl(_("Synthesizer"), wx.Choice, choices=synthsNames)
+		self.synthsComboBox.Select(0)
+		self.synthsComboBox.Bind(wx.EVT_CHOICE, self.onSynthChange)
+		self.synthsComboBox.SetFocus()
+
+		# Translators: Label for the voices combobox in the edit voice profile dialog
+		self.voicesComboBox = sHelper.addLabeledControl(_("Voice"), wx.Choice, choices=[])
+		self.voicesComboBox.Bind(wx.EVT_CHOICE, self.onVoiceChange)
+
+		# Translators: Label for the profile name text field in the edit voice profile dialog
+		self.profileNameTextField = sHelper.addLabeledControl(_("Profile name"), wx.TextCtrl)
+		self.profileNameTextField.Bind(wx.EVT_TEXT, self.onProfileNameChange)
+
+		# Buttons group
+		buttons = gui.guiHelper.ButtonHelper(wx.VERTICAL)
+
+		# Translators: Label for the save button in the edit voice profile dialog
+		self.saveButton = buttons.addButton(self, label=_("Save"))
+		self.saveButton.Bind(wx.EVT_BUTTON, self.onSaveButtonClick)
+		self.saveButton.SetDefault()
+
+		# Translators: Label for the cancel button in the edit voice profile dialog
+		cancelButton = buttons.addButton(self, label=_("Cancel"))
+		cancelButton.Bind(wx.EVT_BUTTON, self.onCancelButtonClick)
+
+		self.updateVoicesComboBox()
+		self.setProfileNameTextBoxToDefault()
+
+		sHelper.addItem(buttons)
+		mainSizer.Add(sHelper.sizer, border=10, flag=wx.ALL)
+		mainSizer.Fit(self)
+		self.SetSizer(mainSizer)
+
+	def onSynthChange(self, event):
+		self.updateVoicesComboBox()
+		self.setProfileNameTextBoxToDefault()
+
+	def onVoiceChange(self, event):
+		self.setProfileNameTextBoxToDefault()
+
+	def onProfileNameChange(self, event):
+		self.app.limitTextField(self.profileNameTextField)
+
+	def updateVoicesComboBox(self):
+		comboBoxItems = []
+		synthSelection = self.synthsComboBox.GetSelection()
+		synthId = self.synthsIds[synthSelection]		
+		self.voicesIds = []
+		if synthId == SilenceSynthDriver.name:
+		# Special treatment for silence synth
+			self.voicesIds = [SilenceSynthDriver.name]
+			comboBoxItems = [consts.SILENCE_VOICE_NAME]
+		else:
+			voices = self.app.getVoicesForSynth(synthId)
+			if voices == None:
+
+				# Translators: Value of the voices combobox in the edit voice dialog when no voices are available
+				comboBoxItems.append(_("No voices available"))
+				self.saveButton.Disable()
+			else:
+				for voice in voices:
+					self.voicesIds.append(voice["id"])
+					comboBoxItems.append(voice["name"])
+				self.saveButton.Enable()
+		self.voicesComboBox.SetItems(comboBoxItems)
+		self.voicesComboBox.Select(0)
+
+	def setProfileNameTextBoxToDefault(self):
+		synthId = self.synthsIds[self.synthsComboBox.GetSelection()]
+		voiceId = self.voicesIds[self.voicesComboBox.GetSelection()]
+		profileName = self.app.getDefaultProfileName(synthId, voiceId)
+		self.profileNameTextField.SetValue(profileName)
+
+	def charHook(self, event):
+		key = event.GetKeyCode()
+		if key == wx.WXK_ESCAPE:
+			self.close()
+		else:
+			event.Skip()
+
+	def onAddButtonClick(self, event):
+		voiceProfileSetting = {
+			"synthId": self.synthsIds[self.synthsComboBox.GetSelection()],
+			"voiceId": self.voicesIds[self.voicesComboBox.GetSelection()],
+		}
+		self.plugin.addVoiceProfileSetting(voiceProfileSetting)
+		self.close()
+
+	def onCancelButtonClick(self, event):
+		self.close()
+
+	def close(self):
+		self.Destroy()
