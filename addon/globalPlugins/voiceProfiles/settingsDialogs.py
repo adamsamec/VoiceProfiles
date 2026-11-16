@@ -121,7 +121,7 @@ class OptionsPanel(SettingsPanel):
 class AddVoiceProfileDialog(wx.Dialog):
 
 	def __init__(self, parent, app):
-		super().__init__(parent, title=_("Add voice profile"))
+		super().__init__(parent, title=_("Add a voice profile"))
 		self.plugin = parent
 		self.app = app
 
