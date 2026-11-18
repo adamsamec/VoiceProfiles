@@ -26,23 +26,23 @@ class VoiceProfiles:
 		OptionsPanel.setAppInstance(self)
 		config.conf.spec["VoiceProfiles"] = consts.CONFIG_SPEC
 
-		self.preventVoiceProfileSettingsUpdate = False
+		self.preventVoiceProfilesUpdate = False
 		self.hasProfileSwitchedPreviously = False
-		self.voiceProfileSettingsToRevert = None
+		self.voiceProfilesToRevert = None
 		self.currentProfileName = consts.NORMAL_PROFILE_NAME
 		self.synthsWithVoices = []
 
 		self.loadSettingsFromConfig()
-		self.addDefaultVoiceProfileSetting()
+		self.addDefaultVoiceProfileVoiceProfile()
 		self.monkeyPatch()
 
 	@property
-	def currentVoiceProfileSettingsIndex(self):
-		return self.profilesVoiceProfileSettingsIndices[self.currentProfileName]
+	def currentVoiceProfilesIndex(self):
+		return self.configProfilesIndices[self.currentProfileName]
 
-	@currentVoiceProfileSettingsIndex.setter
-	def currentVoiceProfileSettingsIndex(self, value):
-		self.profilesVoiceProfileSettingsIndices[self.currentProfileName] = value
+	@currentVoiceProfilesIndex.setter
+	def currentVoiceProfilesIndex(self, value):
+		self.configProfilesIndices[self.currentProfileName] = value
 
 
 	def monkeyPatch(self):
@@ -50,38 +50,38 @@ class VoiceProfiles:
 		for methodName in ["first", "last", "increase", "increaseLarge", "decrease", "decreaseLarge"]:
 			setattr(SynthSetting, methodName, self.mpRingChangeValue(getattr(SynthSetting, methodName)))
 
-	def resetVoiceProfileSettingsToRevert(self):
+	def resetVoiceProfilesToRevert(self):
 		if not self.hasProfileSwitchedPreviously:
-			self.voiceProfileSettingsToRevert = None
+			self.voiceProfilesToRevert = None
 
 	def mpChangeVoice(self, func):
 		def orig(synth, voiceId):
 			ret = func(synth, voiceId)
 
-			# We don't want synth and voice settings to be updated when getting synth instance or when setting new synth during voice profile switch
-			if self.preventVoiceProfileSettingsUpdate:
+			# We don't want synth and voice in profile to be updated when getting synth instance or when setting new synth during voice profile switch
+			if self.preventVoiceProfilesUpdate:
 				return ret
 
 			self.hasProfileSwitchedPreviously = False
 
 			# After some delay, consider the synth and voice change not to be caused by profile switching
-			timer = Timer(0.2, self.resetVoiceProfileSettingsToRevert)
+			timer = Timer(0.2, self.resetVoiceProfilesToRevert)
 			timer.start()
 
 			# Skip voice update if configured so
-			if not self.otherSettings["enableVoiceProfileUpdateWhenNVDAsettingsChange"]:
+			if not self.otherSettings["enableVoiceUpdateWhenNVDAsettingsChange"]:
 				return ret
 
-			if self.voiceProfileSettingsToRevert == None:
-				currentVoiceProfileSettings = self.voiceProfileSettings[self.currentVoiceProfileSettingsIndex]
-				self.voiceProfileSettingsToRevert = {
-					"synthId": currentVoiceProfileSettings["synthId"],
-					"voiceId": currentVoiceProfileSettings["voiceId"]
+			if self.voiceProfilesToRevert == None:
+				currentVoiceProfiles = self.voiceProfiles[self.currentVoiceProfilesIndex]
+				self.voiceProfilesToRevert = {
+					"synthId": currentVoiceProfiles["synthId"],
+					"voiceId": currentVoiceProfiles["voiceId"]
 				}
 			synthId = SilenceSynthDriver.name if synth == None else synth.name
 			if synth == None:
 				voiceId = SilenceSynthDriver.name
-			self.updateVoiceProfileSettingSynthAndVoice(synthId, voiceId)
+			self.updateVoiceProfileVoiceProfileSynthAndVoice(synthId, voiceId)
 			return ret
 		return orig
 	
@@ -92,7 +92,7 @@ class VoiceProfiles:
 			value = int(origSelf.value)
 			if not param in consts.SAVED_PARAMS:
 				return ret
-			self.updateVoiceProfileSettingParam(param, value)
+			self.updateVoiceProfileVoiceProfileParam(param, value)
 			return ret
 		return orig
 
@@ -103,93 +103,93 @@ class VoiceProfiles:
 			newProfileName = consts.NORMAL_PROFILE_NAME
 
 		# Reverting hack is necessarybecause NVDA is missing a pre profile switch extension point 
-		if self.voiceProfileSettingsToRevert != None:
-			self.updateVoiceProfileSettingSynthAndVoice(self.voiceProfileSettingsToRevert["synthId"], self.voiceProfileSettingsToRevert["voiceId"])
+		if self.voiceProfilesToRevert != None:
+			self.updateVoiceProfileVoiceProfileSynthAndVoice(self.voiceProfilesToRevert["synthId"], self.voiceProfilesToRevert["voiceId"])
 			
-		if not (newProfileName in self.profilesVoiceProfileSettingsIndices):
-			self.profilesVoiceProfileSettingsIndices[newProfileName] = self.currentVoiceProfileSettingsIndex
+		if not (newProfileName in self.configProfilesIndices):
+			self.configProfilesIndices[newProfileName] = self.currentVoiceProfilesIndex
 		self.currentProfileName = newProfileName
-		if self.voiceProfileSettingsToRevert != None:
-			self.voiceProfileSettingsToRevert = None
+		if self.voiceProfilesToRevert != None:
+			self.voiceProfilesToRevert = None
 
-		# Ignore the synth and voice settings saved in the profile and switch to the Voice Profiles settings instead
-		self.changeVoiceOnly(self.currentVoiceProfileSettingsIndex, announceChange=False)
+		# Ignore the synth and voice settings saved in the configuration profile and switch to the Voice Profile synth and voice instead
+		self.changeVoiceOnly(self.currentVoiceProfilesIndex, announceChange=False)
 
-	def cleanUpVoiceProfileSettings(self):
+	def cleanUpVoiceProfiles(self):
 		self.updateSynthsWithVoices()
-		self.currentVoiceProfileSettingsIndex = self.deleteInvalidVoiceProfileSettings(startIndex=self.currentVoiceProfileSettingsIndex)
-		self.addDefaultVoiceProfileSetting()
+		self.currentVoiceProfilesIndex = self.deleteInvalidVoiceProfiles(startIndex=self.currentVoiceProfilesIndex)
+		self.addDefaultVoiceProfileVoiceProfile()
 
 		# Fix for broken speech settings ring after deleting voices for some synths (e.g., Microsoft OneCore)
 		synth = getSynth()
 		if synth != None:
 			setSynth(synth.name)
 
-	def deleteInvalidVoiceProfileSettings(self, startIndex=0, dontChangeVoice=False):
+	def deleteInvalidVoiceProfiles(self, startIndex=0, dontChangeVoice=False):
 		newValidIndex = startIndex
 		doChangeVoice = False
 
 		# Start deleting from start index
 		index = self.findNextInvalid(startIndex)
 
-		voiceProfileSettingsLength = len(self.voiceProfileSettings)
-		while voiceProfileSettingsLength > 0 and index >= 0:
-			del self.voiceProfileSettings[index]
-			voiceProfileSettingsLength = len(self.voiceProfileSettings)
+		voiceProfilesLength = len(self.voiceProfiles)
+		while voiceProfilesLength > 0 and index >= 0:
+			del self.voiceProfiles[index]
+			voiceProfilesLength = len(self.voiceProfiles)
 
-			# If some setting before the current one has been deleted, shift the current index to the previous index and change the voice
-			if index < self.currentVoiceProfileSettingsIndex:
-				self.currentVoiceProfileSettingsIndex -= 1
+			# If some voice profile before the current one has been deleted, shift the current index to the previous index and change the voice
+			if index < self.currentVoiceProfilesIndex:
+				self.currentVoiceProfilesIndex -= 1
 				doChangeVoice = True
 
-			# If setting at the same index as the current setting has been deleted, change the voice
-			elif index == self.currentVoiceProfileSettingsIndex:
+			# If the voice profile at the same index as the current profile voice has been deleted, change the voice
+			elif index == self.currentVoiceProfilesIndex:
 				doChangeVoice = True
 				
-			# If some setting before the start index has been deleted, shift the new valid index to the previous index
+			# If some voice profile before the start index has been deleted, shift the new valid index to the previous index
 			if index < startIndex:
 				newValidIndex -= 1
 
 			index = self.findNextInvalid(index)
 
 		# Check if list has been deleted entirely or was originally empty
-		if voiceProfileSettingsLength == 0:
-			self.currentVoiceProfileSettingsIndex = -1
+		if voiceProfilesLength == 0:
+			self.currentVoiceProfilesIndex = -1
 			return -1
 		
 		if doChangeVoice and not dontChangeVoice:
-			self.changeVoiceOnly(self.currentVoiceProfileSettingsIndex, announceChange=False)
+			self.changeVoiceOnly(self.currentVoiceProfilesIndex, announceChange=False)
 
-		# If we deleted voice settings at the start index and after it, move index to 0
-		if newValidIndex >= voiceProfileSettingsLength:
+		# If we deleted the voice profile at the start index and after it, move index to 0
+		if newValidIndex >= voiceProfilesLength:
 			newValidIndex = 0
 		return newValidIndex
 
 	def findNextInvalid(self, startIndex):
-		if len(self.voiceProfileSettings) == 0:
+		if len(self.voiceProfiles) == 0:
 			return -1
 
 		# If start index is out of list bounds, start at zero
-		if startIndex < 0 or startIndex >= len(self.voiceProfileSettings):
+		if startIndex < 0 or startIndex >= len(self.voiceProfiles):
 			startIndex = 0
 
 		index = startIndex
-		while index >= 0 and self.synthAndVoiceExist(self.voiceProfileSettings[index]):
+		while index >= 0 and self.synthAndVoiceExist(self.voiceProfiles[index]):
 			# If list is empty, return not found
-			if len(self.voiceProfileSettings) == 0:
+			if len(self.voiceProfiles) == 0:
 				return -1
-			index = self.getNextVoiceProfileSettingsIndex(index)
+			index = self.getNextVoiceProfilesIndex(index)
 
 			# If we are back on start, we have traversed entire list, so return not found
 			if index == startIndex:
 				return -1
 		return index
 
-	def synthAndVoiceExist(self, voiceProfileSetting):
+	def synthAndVoiceExist(self, voiceProfile):
 		synthExists = False
 		voiceExists = False
 		for synthWithVoices in self.synthsWithVoices:
-			synthId = voiceProfileSetting["synthId"]
+			synthId = voiceProfile["synthId"]
 			if synthWithVoices["id"] == synthId:
 				synthExists = True
 				if synthId == SilenceSynthDriver.name:
@@ -199,7 +199,7 @@ class VoiceProfiles:
 				if voices == None:
 					return False
 				for voice in voices:
-					if voice["id"] == voiceProfileSetting["voiceId"]:
+					if voice["id"] == voiceProfile["voiceId"]:
 						voiceExists = True
 						break
 				else:
@@ -245,9 +245,9 @@ class VoiceProfiles:
 						synthWithVoices["voices"] = [{"id": id, "name": voices[id].displayName} for id in voices]
 					else:
 						try:
-							self.preventVoiceProfileSettingsUpdate = True
+							self.preventVoiceProfilesUpdate = True
 							instance = getSynthInstance(synthId)
-							self.preventVoiceProfileSettingsUpdate = False
+							self.preventVoiceProfilesUpdate = False
 							voices = instance.availableVoices
 							synthWithVoices["voices"] = [{"id": id, "name": voices[id].displayName} for id in voices]
 							instance.terminate()
@@ -275,54 +275,54 @@ class VoiceProfiles:
 			return None
 
 	def loadSettingsFromConfig(self):
-		self.voiceProfileSettings = [json.loads(voiceProfileSetting) for voiceProfileSetting in self.getConfig("voiceProfileSettings")]
-		self.profilesVoiceProfileSettingsIndices = json.loads(self.getConfig("profilesVoiceProfileSettingsIndices"))
+		self.voiceProfiles = [json.loads(voiceProfile) for voiceProfile in self.getConfig("voiceProfiles")]
+		self.configProfilesIndices = json.loads(self.getConfig("configProfilesIndices"))
 		self.otherSettings = {
-			"enableVoiceProfileUpdateWhenNVDAsettingsChange": self.getConfig("enableVoiceProfileUpdateWhenNVDAsettingsChange")
+			"enableVoiceUpdateWhenNVDAsettingsChange": self.getConfig("enableVoiceUpdateWhenNVDAsettingsChange")
 		}
 		
 		# Create index for naormal profile if not exists
-		voiceProfileSettingsLength = len(self.voiceProfileSettings)
-		if not (consts.NORMAL_PROFILE_NAME in self.profilesVoiceProfileSettingsIndices):
-			if voiceProfileSettingsLength > 0:
-				self.profilesVoiceProfileSettingsIndices[consts.NORMAL_PROFILE_NAME] = 0
+		voiceProfilesLength = len(self.voiceProfiles)
+		if not (consts.NORMAL_PROFILE_NAME in self.configProfilesIndices):
+			if voiceProfilesLength > 0:
+				self.configProfilesIndices[consts.NORMAL_PROFILE_NAME] = 0
 			else:
-				self.profilesVoiceProfileSettingsIndices[consts.NORMAL_PROFILE_NAME] = -1
+				self.configProfilesIndices[consts.NORMAL_PROFILE_NAME] = -1
 
-		if voiceProfileSettingsLength == 0:
-			# Set negative index for all profiles if there are no voice settings
-			for profileName in self.profilesVoiceProfileSettingsIndices:
-				self.profilesVoiceProfileSettingsIndices[profileName] = -1
+		if voiceProfilesLength == 0:
+			# Set negative index for all configuration profiles if there are no voice profiles
+			for profileName in self.configProfilesIndices:
+				self.configProfilesIndices[profileName] = -1
 		else:
-			# Set index to 0 if index is out of voice settings bounds for each profile
-			for profileName in self.profilesVoiceProfileSettingsIndices:
-				if self.profilesVoiceProfileSettingsIndices[profileName] < 0 or self.profilesVoiceProfileSettingsIndices[profileName] >= len(self.voiceProfileSettings):
-					self.profilesVoiceProfileSettingsIndices[profileName] = 0
+			# Set index to 0 if index is out of voice profiles bounds for each configuration profile
+			for profileName in self.configProfilesIndices:
+				if self.configProfilesIndices[profileName] < 0 or self.configProfilesIndices[profileName] >= len(self.voiceProfiles):
+					self.configProfilesIndices[profileName] = 0
 
 	def saveSettingsTOConfig(self):
-		voiceProfileSettingsJson = [json.dumps(voiceProfileSetting) for voiceProfileSetting in self.voiceProfileSettings]
-		self.setConfig("voiceProfileSettings", voiceProfileSettingsJson)
-		self.setConfig("profilesVoiceProfileSettingsIndices", json.dumps(self.profilesVoiceProfileSettingsIndices))
-		self.setConfig("enableVoiceProfileUpdateWhenNVDAsettingsChange", self.otherSettings["enableVoiceProfileUpdateWhenNVDAsettingsChange"])
+		voiceProfilesJson = [json.dumps(voiceProfile) for voiceProfile in self.voiceProfiles]
+		self.setConfig("voiceProfiles", voiceProfilesJson)
+		self.setConfig("configProfilesIndices", json.dumps(self.configProfilesIndices))
+		self.setConfig("enableVoiceUpdateWhenNVDAsettingsChange", self.otherSettings["enableVoiceUpdateWhenNVDAsettingsChange"])
 
-	def addDefaultVoiceProfileSetting(self):
-		# Create and add the default voice setting if does not exist
-		if len(self.voiceProfileSettings) == 0:
-			self.currentVoiceProfileSettingsIndex = 0
-			voiceProfileSetting = self.getFreshVoiceProfileSetting()
-			if voiceProfileSetting != None:
-				self.voiceProfileSettings.append(voiceProfileSetting)
+	def addDefaultVoiceProfileVoiceProfile(self):
+		# Create and add the default voice profile if does not exist
+		if len(self.voiceProfiles) == 0:
+			self.currentVoiceProfilesIndex = 0
+			voiceProfile = self.getFreshVoiceProfileVoiceProfile()
+			if voiceProfile != None:
+				self.voiceProfiles.append(voiceProfile)
 
 	def addMissingProfileNames(self):
-		for voiceProfileSetting in self.voiceProfileSettings:
-			if not "name" in voiceProfileSetting:
+		for voiceProfile in self.voiceProfiles:
+			if not "name" in voiceProfile:
 				print("tester")
-				print(voiceProfileSetting["synthId"])
-				print(voiceProfileSetting["voiceId"])
-				voiceProfileSetting["name"] = self.getDefaultProfileName(voiceProfileSetting["synthId"], voiceProfileSetting["voiceId"])
+				print(voiceProfile["synthId"])
+				print(voiceProfile["voiceId"])
+				voiceProfile["name"] = self.getDefaultProfileName(voiceProfile["synthId"], voiceProfile["voiceId"])
 
-	def getVoiceProfileSettings(self):
-		return self.voiceProfileSettings.copy()
+	def getVoiceProfiles(self):
+		return self.voiceProfiles.copy()
 
 	def getOtherSettings(self):
 		return self.otherSettings.copy()
@@ -340,125 +340,125 @@ class VoiceProfiles:
 			profileName = synthName if synthId == SilenceSynthDriver.name else f"{voiceName} ({synthName})"
 		return profileName
 
-	def applyVoiceProfileSettings(self, voiceProfileSettings):
-		self.voiceProfileSettings = voiceProfileSettings.copy()
-		self.changeVoiceOnly(self.currentVoiceProfileSettingsIndex, announceChange=False)
+	def applyVoiceProfiles(self, voiceProfiles):
+		self.voiceProfiles = voiceProfiles.copy()
+		self.changeVoiceOnly(self.currentVoiceProfilesIndex, announceChange=False)
 
 	def applyOtherSettingsAndSave(self, otherSettings):
 		self.otherSettings = otherSettings.copy()
 		self.saveSettingsTOConfig()
 
 	def switchToNextVoiceProfile(self):
-		if len(self.voiceProfileSettings) == 0:
+		if len(self.voiceProfiles) == 0:
 			return
-		nextIndex = self.getNextVoiceProfileSettingsIndex(self.currentVoiceProfileSettingsIndex)
+		nextIndex = self.getNextVoiceProfilesIndex(self.currentVoiceProfilesIndex)
 		self.changeVoice(nextIndex)
 
 	def switchToPrevVoiceProfile(self):
-		if len(self.voiceProfileSettings) == 0:
+		if len(self.voiceProfiles) == 0:
 			return
-		prevIndex = self.getPrevVoiceProfileSettingsIndex(self.currentVoiceProfileSettingsIndex)
+		prevIndex = self.getPrevVoiceProfilesIndex(self.currentVoiceProfilesIndex)
 		self.changeVoice(prevIndex)
 
 	def showSelectVoiceProfileDialog(self):
-		self.cleanUpVoiceProfileSettings()
+		self.cleanUpVoiceProfiles()
 		gui.mainFrame.prePopup()
 		selectVoiceProfileDialog = SelectVoiceProfileDialog(gui.mainFrame, self)
 		selectVoiceProfileDialog.Show()
 		gui.mainFrame.postPopup()
 
-	def getNextVoiceProfileSettingsIndex(self, index):
+	def getNextVoiceProfilesIndex(self, index):
 		verifyResult = self.verifyIndex(index)
 		if verifyResult <= 0:
 			return verifyResult
-		newIndex = (index + 1) % len(self.voiceProfileSettings)
+		newIndex = (index + 1) % len(self.voiceProfiles)
 		return newIndex
 
-	def getPrevVoiceProfileSettingsIndex(self, index):
+	def getPrevVoiceProfilesIndex(self, index):
 		verifyResult = self.verifyIndex(index)
 		if verifyResult <= 0:
 			return verifyResult
-		newIndex = (index - 1) % len(self.voiceProfileSettings)
+		newIndex = (index - 1) % len(self.voiceProfiles)
 		return newIndex
 
 	def verifyIndex(self, index):
-		voiceProfileSettingsLength = len(self.voiceProfileSettings)
-		if voiceProfileSettingsLength == 0:
+		voiceProfilesLength = len(self.voiceProfiles)
+		if voiceProfilesLength == 0:
 			return -1
 
 		# If index is out of list bounds and list is not empty, return zero
-		if index < 0 or index >= voiceProfileSettingsLength:
+		if index < 0 or index >= voiceProfilesLength:
 			return 0
 
 		return 1
 
 	def changeVoice(self, newIndex, announceChange=True):
 		newIndex = self.changeVoiceOnly(newIndex, announceChange)
-		self.currentVoiceProfileSettingsIndex = newIndex
+		self.currentVoiceProfilesIndex = newIndex
 
 	def changeVoiceOnly(self, newIndex, announceChange=True):
-		voiceProfileSettingsLength = len(self.voiceProfileSettings)
-		if (newIndex >= voiceProfileSettingsLength) or (newIndex < 0):
-			if voiceProfileSettingsLength > 0:
+		voiceProfilesLength = len(self.voiceProfiles)
+		if (newIndex >= voiceProfilesLength) or (newIndex < 0):
+			if voiceProfilesLength > 0:
 				return 0
 			else:
 				return -1
 		
-		# Determine the next voice setting
-		newVoiceProfileSetting = self.voiceProfileSettings[newIndex]
+		# Determine the next voice profile
+		newVoiceProfileVoiceProfile = self.voiceProfiles[newIndex]
 
-		# Delete all invalid voice settings starting from the new index, and update the new index if necessary
+		# Delete all invalid voice profiles starting from the new index, and update the new index if necessary
 		self.updateSynthsWithVoices()
-		newIndex = self.deleteInvalidVoiceProfileSettings(startIndex=newIndex, dontChangeVoice=True)
-		self.addDefaultVoiceProfileSetting()
-		voiceProfileSettingsLength = len(self.voiceProfileSettings)
-		if voiceProfileSettingsLength == 0:
-			# If after deleting all invalid voice settings there were no voice settings and we did not add a default one, return -1
+		newIndex = self.deleteInvalidVoiceProfiles(startIndex=newIndex, dontChangeVoice=True)
+		self.addDefaultVoiceProfileVoiceProfile()
+		voiceProfilesLength = len(self.voiceProfiles)
+		if voiceProfilesLength == 0:
+			# If after deleting all invalid voice profiles there were no voice profiles and we did not add a default one, return -1
 			return -1
 		elif newIndex == -1:
-			# If after deleting all invalid voice settings there were no voice settings and we added a default one, set index to this default voice setting index
+			# If after deleting all invalid voice profiles there were no voice profiles and we added a default one, set index to this default voice profile index
 			newIndex = 0
 
-		newVoiceProfileSetting = self.voiceProfileSettings[newIndex]
+		newVoiceProfileVoiceProfile = self.voiceProfiles[newIndex]
 		synth = getSynth()
 
-		if newVoiceProfileSetting["synthId"] == SilenceSynthDriver.name:
+		if newVoiceProfileVoiceProfile["synthId"] == SilenceSynthDriver.name:
 			if synth != None:
 				setSynth(None)
 		else:
-			self.preventVoiceProfileSettingsUpdate = True
-			setSynth(newVoiceProfileSetting["synthId"])
-			self.preventVoiceProfileSettingsUpdate = False
+			self.preventVoiceProfilesUpdate = True
+			setSynth(newVoiceProfileVoiceProfile["synthId"])
+			self.preventVoiceProfilesUpdate = False
 			synth = getSynth()
 		
-		# Apply new voice setting
-		if newVoiceProfileSetting["synthId"] != SilenceSynthDriver.name:
-			synth.voice = newVoiceProfileSetting["voiceId"]
+		# Apply new voice profile
+		if newVoiceProfileVoiceProfile["synthId"] != SilenceSynthDriver.name:
+			synth.voice = newVoiceProfileVoiceProfile["voiceId"]
 			for param in consts.SAVED_PARAMS:
-				if param in newVoiceProfileSetting:
-					setattr(synth, param, newVoiceProfileSetting[param])
+				if param in newVoiceProfileVoiceProfile:
+					setattr(synth, param, newVoiceProfileVoiceProfile[param])
 				else:
 					setattr(synth, param, consts.DEFAULT_PARAMS_VALUES[param])
 			if synth != None:
 				synth.saveSettings()
-		if announceChange and newVoiceProfileSetting["synthId"] != SilenceSynthDriver.name:
-			ui.message(newVoiceProfileSetting["name"])
+		if announceChange and newVoiceProfileVoiceProfile["synthId"] != SilenceSynthDriver.name:
+			ui.message(newVoiceProfileVoiceProfile["name"])
 		return newIndex
 
-	def updateVoiceProfileSettingParam(self, param, value):
-		if self.currentVoiceProfileSettingsIndex < 0 or len(self.voiceProfileSettings) <= self.currentVoiceProfileSettingsIndex:
+	def updateVoiceProfileVoiceProfileParam(self, param, value):
+		if self.currentVoiceProfilesIndex < 0 or len(self.voiceProfiles) <= self.currentVoiceProfilesIndex:
 			return None
-		currentVoiceProfileSetting = self.voiceProfileSettings[self.currentVoiceProfileSettingsIndex]
-		currentVoiceProfileSetting[param] = value
+		currentVoiceProfileVoiceProfile = self.voiceProfiles[self.currentVoiceProfilesIndex]
+		currentVoiceProfileVoiceProfile[param] = value
 
-	def updateVoiceProfileSettingSynthAndVoice(self, synthId, voiceId):
-		if self.currentVoiceProfileSettingsIndex < 0 or len(self.voiceProfileSettings) <= self.currentVoiceProfileSettingsIndex:
+	def updateVoiceProfileVoiceProfileSynthAndVoice(self, synthId, voiceId):
+		if self.currentVoiceProfilesIndex < 0 or len(self.voiceProfiles) <= self.currentVoiceProfilesIndex:
 			return
-		currentVoiceProfileSetting = self.voiceProfileSettings[self.currentVoiceProfileSettingsIndex]
-		currentVoiceProfileSetting["synthId"] = synthId
-		currentVoiceProfileSetting["voiceId"] = voiceId
+		currentVoiceProfileVoiceProfile = self.voiceProfiles[self.currentVoiceProfilesIndex]
+		currentVoiceProfileVoiceProfile["synthId"] = synthId
+		currentVoiceProfileVoiceProfile["voiceId"] = voiceId
 
-	def getFreshVoiceProfileSetting(self):
+	def getFreshVoiceProfileVoiceProfile(self):
 		synth = getSynth()
 		if synth == None:
 			synthId = SilenceSynthDriver.name
@@ -466,14 +466,14 @@ class VoiceProfiles:
 		else:
 			synthId = synth.name
 			voiceId = synth.voice
-		voiceProfileSetting = {
+		voiceProfile = {
 			"synthId": synthId,
 			"voiceId": voiceId,
 		}
 		for param in consts.SAVED_PARAMS:
 			if hasattr(synth, param):
-				voiceProfileSetting[param] = getattr(synth, param)
-		return voiceProfileSetting
+				voiceProfile[param] = getattr(synth, param)
+		return voiceProfile
 
 	def limitTextField(self, textField):
 		value = textField.GetValue()

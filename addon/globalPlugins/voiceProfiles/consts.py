@@ -11,9 +11,9 @@ SILENCE_VOICE_NAME = _("Silence")
 
 NORMAL_PROFILE_NAME = "[normal]"
 CONFIG_SPEC = {
-	"voiceProfileSettings": "string_list(default=list())",
-	"profilesVoiceProfileSettingsIndices": "string(default='{}')",
-	"enableVoiceProfileUpdateWhenNVDAsettingsChange": "boolean(default=True)",
+	"voiceProfiles": "string_list(default=list())",
+	"configProfilesIndices": "string(default='{}')",
+	"enableVoiceUpdateWhenNVDAsettingsChange": "boolean(default=True)",
 }
 SAVED_PARAMS = ["volume", "rate", "rateBoost"]
 DEFAULT_PARAMS_VALUES = {

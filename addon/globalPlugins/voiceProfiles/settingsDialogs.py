@@ -41,7 +41,7 @@ class OptionsPanel(SettingsPanel):
 
 	def makeSettings(self, settingsSizer):
 		self.loadSettings()
-		self.isVoiceProfileSettingsModified = False
+		self.isVoiceProfilesModified = False
 
 		sHelper = gui.guiHelper.BoxSizerHelper(self, sizer=settingsSizer)
 
@@ -67,32 +67,32 @@ class OptionsPanel(SettingsPanel):
 
 		sHelper.addItem(buttons)
 
-		# Translators: Label for the update voice profile parameters when NVDA's own speech settings change checkbox in the add-on settings
-		self.updateVoiceProfileParametersCheckbox = sHelper.addItem(wx.CheckBox(self, label=_("Update voice profile parameters when NVDA's own speech settings change")))
-		self.updateVoiceProfileParametersCheckbox.SetValue(self.otherSettings["enableVoiceProfileUpdateWhenNVDAsettingsChange"])
+		# Translators: Label for the update voice when NVDA's own speech settings change checkbox in the add-on settings
+		self.updateVoiceCheckbox = sHelper.addItem(wx.CheckBox(self, label=_("Update voice when NVDA's own speech settings change")))
+		self.updateVoiceCheckbox.SetValue(self.otherSettings["enableVoiceUpdateWhenNVDAsettingsChange"])
 
 	def loadSettings(self):
-		self.app.cleanUpVoiceProfileSettings()
-		self.voiceProfileSettings = self.app.getVoiceProfileSettings()
+		self.app.cleanUpVoiceProfiles()
+		self.voiceProfiles = self.app.getVoiceProfiles()
 		self.otherSettings = self.app.getOtherSettings()
 
 	def updateVoiceProfilesListBox(self, selectionIndex=0):
-		listBoxItems = [voiceProfileSetting["name"] for voiceProfileSetting in self.voiceProfileSettings]
+		listBoxItems = [voiceProfile["name"] for voiceProfile in self.voiceProfiles]
 		self.voiceProfilesListBox.SetItems(listBoxItems)
 		if len(listBoxItems) > 0:
 			self.voiceProfilesListBox.SetSelection(selectionIndex)
 
-	def addVoiceProfileSetting(self, voiceProfile):
-		insertIndex = 0 if len(self.voiceProfileSettings) == 0 else self.voiceProfilesListBox.GetSelection() + 1
-		self.voiceProfileSettings.insert(insertIndex, voiceProfile)
+	def addVoiceProfile(self, voiceProfile):
+		insertIndex = 0 if len(self.voiceProfiles) == 0 else self.voiceProfilesListBox.GetSelection() + 1
+		self.voiceProfiles.insert(insertIndex, voiceProfile)
 		self.updateVoiceProfilesListBox(insertIndex)
-		self.isVoiceProfileSettingsModified = True
+		self.isVoiceProfilesModified = True
 		self.updateRemoveButtonState()
 
-	def saveVoiceProfileSetting(self, voiceProfile, index):
-		self.voiceProfileSettings[index] = voiceProfile
+	def saveVoiceProfile(self, voiceProfile, index):
+		self.voiceProfiles[index] = voiceProfile
 		self.updateVoiceProfilesListBox(index)
-		self.isVoiceProfileSettingsModified = True
+		self.isVoiceProfilesModified = True
 
 	def onAddButtonClick(self, event):
 		addVoiceProfileDialog = AddVoiceProfileDialog(self, self.app)
@@ -103,27 +103,27 @@ class OptionsPanel(SettingsPanel):
 		editVoiceProfileDialog.ShowModal()
 
 	def onRemoveButtonClick(self, event):
-		if len(self.voiceProfileSettings) == 1:
+		if len(self.voiceProfiles) == 1:
 			ui.message(_("The last remaining voice profile cannot be removed"))
 			return
 		selectionIndex = self.voiceProfilesListBox.GetSelection()
-		del self.voiceProfileSettings[selectionIndex]
-		newSelectionIndex = max(0, min(selectionIndex, len(self.voiceProfileSettings) - 1))
+		del self.voiceProfiles[selectionIndex]
+		newSelectionIndex = max(0, min(selectionIndex, len(self.voiceProfiles) - 1))
 		self.updateVoiceProfilesListBox(newSelectionIndex)
-		self.isVoiceProfileSettingsModified = True
+		self.isVoiceProfilesModified = True
 
 	def updateRemoveButtonState(self):
-		if len(self.voiceProfileSettings) > 0:
+		if len(self.voiceProfiles) > 0:
 			self.removeButton.Enable()
 		else:
 			self.removeButton.Disable()
 
 	def onSave(self):
-		if self.isVoiceProfileSettingsModified:
-			self.app.applyVoiceProfileSettings(self.voiceProfileSettings)
-			self.isVoiceProfileSettingsModified = False
+		if self.isVoiceProfilesModified:
+			self.app.applyVoiceProfiles(self.voiceProfiles)
+			self.isVoiceProfilesModified = False
 
-		self.otherSettings["enableVoiceProfileUpdateWhenNVDAsettingsChange"] = self.updateVoiceProfileParametersCheckbox.GetValue()
+		self.otherSettings["enableVoiceUpdateWhenNVDAsettingsChange"] = self.updateVoiceCheckbox.GetValue()
 		self.app.applyOtherSettingsAndSave(self.otherSettings)
 
 class AddVoiceProfileDialog(wx.Dialog):
@@ -227,12 +227,12 @@ class AddVoiceProfileDialog(wx.Dialog):
 			event.Skip()
 
 	def onAddButtonClick(self, event):
-		voiceProfileSetting = {
+		voiceProfile = {
 			"name": self.profileNameTextField.GetValue(),
 			"synthId": self.synthsIds[self.synthsComboBox.GetSelection()],
 			"voiceId": self.voicesIds[self.voicesComboBox.GetSelection()],
 		}
-		self.plugin.addVoiceProfileSetting(voiceProfileSetting)
+		self.plugin.addVoiceProfile(voiceProfile)
 		self.close()
 
 	def onCancelButtonClick(self, event):
@@ -249,7 +249,7 @@ class EditVoiceProfileDialog(wx.Dialog):
 		self.plugin = parent
 		self.app = app
 		self.voiceProfileIndex = self.plugin.voiceProfilesListBox.GetSelection()
-		self.editedVoiceProfileSettings = self.plugin.voiceProfileSettings[self.voiceProfileIndex]
+		self.editedVoiceProfiles = self.plugin.voiceProfiles[self.voiceProfileIndex]
 
 		self.Bind(wx.EVT_CHAR_HOOK, self.charHook)
 		self.addWidgets()
@@ -265,8 +265,8 @@ class EditVoiceProfileDialog(wx.Dialog):
 		synthsNames = [synthWithVoices["name"] for synthWithVoices in synthsWithVoices]
 		# Translators: Label for the synthesizers combobox in the edit voice profile dialog
 		self.synthsComboBox = sHelper.addLabeledControl(_("Synthesizer"), wx.Choice, choices=synthsNames)
-		if self.editedVoiceProfileSettings["synthId"] in self.synthsIds:
-			selection = self.synthsIds.index(self.editedVoiceProfileSettings["synthId"])
+		if self.editedVoiceProfiles["synthId"] in self.synthsIds:
+			selection = self.synthsIds.index(self.editedVoiceProfiles["synthId"])
 		else:
 			selection = 0
 		self.synthsComboBox.Select(selection)
@@ -279,7 +279,7 @@ class EditVoiceProfileDialog(wx.Dialog):
 
 		# Translators: Label for the profile name text field in the edit voice profile dialog
 		self.profileNameTextField = sHelper.addLabeledControl(_("Profile name"), wx.TextCtrl)
-		self.profileNameTextField.SetValue(self.editedVoiceProfileSettings["name"])
+		self.profileNameTextField.SetValue(self.editedVoiceProfiles["name"])
 		self.profileNameTextField.Bind(wx.EVT_TEXT, self.onProfileNameChange)
 
 		# Buttons group
@@ -295,8 +295,8 @@ class EditVoiceProfileDialog(wx.Dialog):
 		cancelButton.Bind(wx.EVT_BUTTON, self.onCancelButtonClick)
 
 		self.updateVoicesComboBox()
-		if self.editedVoiceProfileSettings["voiceId"] in self.voicesIds:
-			selection = self.voicesIds.index(self.editedVoiceProfileSettings["voiceId"])
+		if self.editedVoiceProfiles["voiceId"] in self.voicesIds:
+			selection = self.voicesIds.index(self.editedVoiceProfiles["voiceId"])
 		else:
 			selection = 0
 		self.voicesComboBox.Select(selection)
@@ -348,12 +348,12 @@ class EditVoiceProfileDialog(wx.Dialog):
 			event.Skip()
 
 	def onSaveButtonClick(self, event):
-		voiceProfileSetting = {
+		voiceProfile = {
 			"name": self.profileNameTextField.GetValue(),
 			"synthId": self.synthsIds[self.synthsComboBox.GetSelection()],
 			"voiceId": self.voicesIds[self.voicesComboBox.GetSelection()],
 		}
-		self.plugin.saveVoiceProfileSetting(voiceProfileSetting, self.voiceProfileIndex)
+		self.plugin.saveVoiceProfile(voiceProfile, self.voiceProfileIndex)
 		self.close()
 
 	def onCancelButtonClick(self, event):
