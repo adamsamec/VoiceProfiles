@@ -226,6 +226,7 @@ class VoiceProfiles:
 					"voices": None
 				})
 		self.synthsWithVoices = newSynthsWithVoices
+		self.addMissingProfileNames()
 
 	def getSynthsWithVoices(self):
 		return self.synthsWithVoices.copy()
@@ -312,6 +313,14 @@ class VoiceProfiles:
 			if voiceProfileSetting != None:
 				self.voiceProfileSettings.append(voiceProfileSetting)
 
+	def addMissingProfileNames(self):
+		for voiceProfileSetting in self.voiceProfileSettings:
+			if not "name" in voiceProfileSetting:
+				print("tester")
+				print(voiceProfileSetting["synthId"])
+				print(voiceProfileSetting["voiceId"])
+				voiceProfileSetting["name"] = self.getDefaultProfileName(voiceProfileSetting["synthId"], voiceProfileSetting["voiceId"])
+
 	def getVoiceProfileSettings(self):
 		return self.voiceProfileSettings.copy()
 
@@ -321,6 +330,9 @@ class VoiceProfiles:
 	def getDefaultProfileName(self, synthId, voiceId):
 		synthName = self.getSynthNameById(synthId)
 		voiceName = self.getVoiceNameById(synthId, voiceId)
+		print("testing")
+		print(synthName)
+		print(voiceName)
 		if synthName == None or voiceName == None:
 			# Translators: Default profile name for unknown voice
 			profileName = _("Unknown")
@@ -430,8 +442,7 @@ class VoiceProfiles:
 			if synth != None:
 				synth.saveSettings()
 		if announceChange and newVoiceProfileSetting["synthId"] != SilenceSynthDriver.name:
-			voiceName = self.getVoiceNameById(newVoiceProfileSetting["synthId"], newVoiceProfileSetting["voiceId"])
-			ui.message(voiceName)
+			ui.message(newVoiceProfileSetting["name"])
 		return newIndex
 
 	def updateVoiceProfileSettingParam(self, param, value):

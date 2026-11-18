@@ -24,6 +24,7 @@ class SelectVoiceProfileDialog(wx.Dialog):
 
 		super(SelectVoiceProfileDialog, self).__init__(parent, title=_("Select a voice profile"))
 		self.app = app
+		self.voiceProfileSettings = self.app.getVoiceProfileSettings()
 		self.doChangeVoice = False
 
 		self.Bind(wx.EVT_CHAR_HOOK, self.charHook)
@@ -57,13 +58,7 @@ class SelectVoiceProfileDialog(wx.Dialog):
 		self.SetSizer(mainSizer)
 
 	def initVoiceProfilesListBox(self):
-		listBoxItems = []
-		voiceProfileSettings = self.app.getVoiceProfileSettings()
-		for voiceProfileSetting in voiceProfileSettings:
-			synthName = self.app.getSynthNameById(voiceProfileSetting["synthId"])
-			voiceName = self.app.getVoiceNameById(voiceProfileSetting["synthId"], voiceProfileSetting["voiceId"])
-			choice = synthName if voiceProfileSetting["synthId"] == SilenceSynthDriver.name else f"{voiceName} ({synthName})"
-			listBoxItems.append(choice)
+		listBoxItems = [voiceProfileSetting["name"] for voiceProfileSetting in self.voiceProfileSettings]
 		self.voiceProfilesListBox.SetItems(listBoxItems)
 
 	def charHook(self, event):
