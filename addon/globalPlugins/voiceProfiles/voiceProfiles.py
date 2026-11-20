@@ -28,7 +28,6 @@ class VoiceProfiles:
 
 		self.preventVoiceProfilesUpdate = False
 		self.hasConfigProfileSwitchedPreviously = False
-		self.preventSetSynthIfSynthNotChanged = False
 		self.voiceProfilesToRevert = None
 		self.currentProfileName = consts.NORMAL_PROFILE_NAME
 		self.synthsWithVoices = []
@@ -114,9 +113,7 @@ class VoiceProfiles:
 			self.voiceProfilesToRevert = None
 
 		# Ignore the synth and voice settings saved in the configuration profile and switch to the Voice Profile synth and voice instead
-		self.preventSetSynthIfSynthNotChanged = True
 		self.changeVoiceProfileOnly(self.currentVoiceProfilesIndex, announceChange=False)
-		self.preventSetSynthIfSynthNotChanged = False
 
 	def cleanUpVoiceProfiles(self):
 		self.updateSynthsWithVoices()
@@ -429,10 +426,7 @@ class VoiceProfiles:
 			if synth != None:
 				setSynth(None)
 		else:
-			self.preventVoiceProfilesUpdate = True
-			if not self.preventSetSynthIfSynthNotChanged or newVoiceProfile["synthId"] != synth.name:
-				setSynth(newVoiceProfile["synthId"])
-			self.preventVoiceProfilesUpdate = False
+			setSynth(newVoiceProfile["synthId"])
 			synth = getSynth()
 		
 		# Apply new voice profile
