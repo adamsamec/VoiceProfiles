@@ -27,7 +27,7 @@ class VoiceProfiles:
 		config.conf.spec["VoiceProfiles"] = consts.CONFIG_SPEC
 
 		self.preventVoiceProfilesUpdate = False
-		self.hasProfileSwitchedPreviously = False
+		self.hasConfigProfileSwitchedPreviously = False
 		self.preventSetSynthIfSynthNotChanged = False
 		self.voiceProfilesToRevert = None
 		self.currentProfileName = consts.NORMAL_PROFILE_NAME
@@ -52,7 +52,7 @@ class VoiceProfiles:
 			setattr(SynthSetting, methodName, self.mpRingChangeValue(getattr(SynthSetting, methodName)))
 
 	def resetVoiceProfilesToRevert(self):
-		if not self.hasProfileSwitchedPreviously:
+		if not self.hasConfigProfileSwitchedPreviously:
 			self.voiceProfilesToRevert = None
 
 	def mpChangeVoice(self, func):
@@ -63,7 +63,7 @@ class VoiceProfiles:
 			if self.preventVoiceProfilesUpdate:
 				return ret
 
-			self.hasProfileSwitchedPreviously = False
+			self.hasConfigProfileSwitchedPreviously = False
 
 			# After some delay, consider the synth and voice change not to be caused by profile switching
 			timer = Timer(0.2, self.resetVoiceProfilesToRevert)
@@ -98,12 +98,12 @@ class VoiceProfiles:
 		return orig
 
 	def handleProfileSwitch(self):
-		self.hasProfileSwitchedPreviously = True
+		self.hasConfigProfileSwitchedPreviously = True
 		newProfileName = config.conf.profiles[-1].name
 		if not newProfileName:
 			newProfileName = consts.NORMAL_PROFILE_NAME
 
-		# Reverting hack is necessarybecause NVDA is missing a pre profile switch extension point 
+		# Reverting hack is necessary because NVDA is missing a pre profile switch extension point 
 		if self.voiceProfilesToRevert != None:
 			self.updateVoiceProfileSynthAndVoice(self.voiceProfilesToRevert["synthId"], self.voiceProfilesToRevert["voiceId"])
 			
@@ -115,7 +115,7 @@ class VoiceProfiles:
 
 		# Ignore the synth and voice settings saved in the configuration profile and switch to the Voice Profile synth and voice instead
 		self.preventSetSynthIfSynthNotChanged = True
-		self.changeVoiceOnly(self.currentVoiceProfilesIndex, announceChange=False)
+		self.changeVoiceProfileOnly(self.currentVoiceProfilesIndex, announceChange=False)
 		self.preventSetSynthIfSynthNotChanged = False
 
 	def cleanUpVoiceProfiles(self):
@@ -161,7 +161,7 @@ class VoiceProfiles:
 			return -1
 		
 		if doChangeVoice and not dontChangeVoice:
-			self.changeVoiceOnly(self.currentVoiceProfilesIndex, announceChange=False)
+			self.changeVoiceProfileOnly(self.currentVoiceProfilesIndex, announceChange=False)
 
 		# If we deleted the voice profile at the start index and after it, move index to 0
 		if newValidIndex >= voiceProfilesLength:
@@ -345,7 +345,7 @@ class VoiceProfiles:
 
 	def applyVoiceProfiles(self, voiceProfiles):
 		self.voiceProfiles = voiceProfiles.copy()
-		self.changeVoiceOnly(self.currentVoiceProfilesIndex, announceChange=False)
+		self.changeVoiceProfileOnly(self.currentVoiceProfilesIndex, announceChange=False)
 
 	def applyOtherSettingsAndSave(self, otherSettings):
 		self.otherSettings = otherSettings.copy()
@@ -355,13 +355,13 @@ class VoiceProfiles:
 		if len(self.voiceProfiles) == 0:
 			return
 		nextIndex = self.getNextVoiceProfilesIndex(self.currentVoiceProfilesIndex)
-		self.changeVoice(nextIndex)
+		self.changeVoiceProfile(nextIndex)
 
 	def switchToPrevVoiceProfile(self):
 		if len(self.voiceProfiles) == 0:
 			return
 		prevIndex = self.getPrevVoiceProfilesIndex(self.currentVoiceProfilesIndex)
-		self.changeVoice(prevIndex)
+		self.changeVoiceProfile(prevIndex)
 
 	def showSelectVoiceProfileDialog(self):
 		self.cleanUpVoiceProfiles()
@@ -371,20 +371,20 @@ class VoiceProfiles:
 		gui.mainFrame.postPopup()
 
 	def getNextVoiceProfilesIndex(self, index):
-		verifyResult = self.verifyIndex(index)
+		verifyResult = self.verifyVoiceProfileIndex(index)
 		if verifyResult <= 0:
 			return verifyResult
 		newIndex = (index + 1) % len(self.voiceProfiles)
 		return newIndex
 
 	def getPrevVoiceProfilesIndex(self, index):
-		verifyResult = self.verifyIndex(index)
+		verifyResult = self.verifyVoiceProfileIndex(index)
 		if verifyResult <= 0:
 			return verifyResult
 		newIndex = (index - 1) % len(self.voiceProfiles)
 		return newIndex
 
-	def verifyIndex(self, index):
+	def verifyVoiceProfileIndex(self, index):
 		voiceProfilesLength = len(self.voiceProfiles)
 		if voiceProfilesLength == 0:
 			return -1
@@ -395,11 +395,11 @@ class VoiceProfiles:
 
 		return 1
 
-	def changeVoice(self, newIndex, announceChange=True):
-		newIndex = self.changeVoiceOnly(newIndex, announceChange)
+	def changeVoiceProfile(self, newIndex, announceChange=True):
+		newIndex = self.changeVoiceProfileOnly(newIndex, announceChange)
 		self.currentVoiceProfilesIndex = newIndex
 
-	def changeVoiceOnly(self, newIndex, announceChange=True):
+	def changeVoiceProfileOnly(self, newIndex, announceChange=True):
 		voiceProfilesLength = len(self.voiceProfiles)
 		if (newIndex >= voiceProfilesLength) or (newIndex < 0):
 			if voiceProfilesLength > 0:
