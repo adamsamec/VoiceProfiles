@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 'voiceProfiles' '1.0.0'\n"
 "Report-Msgid-Bugs-To: 'nvda-translations@groups.io'\n"
-"POT-Creation-Date: 2026-11-16 12:50+0100\n"
+"POT-Creation-Date: 2026-11-21 11:58+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,17 +19,17 @@ msgstr ""
 
 #. Translators: Switch to the next voice profile gesture description for the Input gestures settings dialog
 #: addon\globalPlugins\voiceProfiles\__init__.py:35
-msgid "Switches to the next voice profile."
+msgid "Switches to the next voice profile"
 msgstr ""
 
 #. Translators: Switch to the previous voice profile gesture description for the Input gestures settings dialog
 #: addon\globalPlugins\voiceProfiles\__init__.py:43
-msgid "Switches to the previous voice profile."
+msgid "Switches to the previous voice profile"
 msgstr ""
 
 #. Translators: Select a voice profile gesture description for the Input gestures settings dialog
 #: addon\globalPlugins\voiceProfiles\__init__.py:51
-msgid "Shows the dialog for selecting a voice profile."
+msgid "Shows the dialog for selecting a voice profile"
 msgstr ""
 
 #. Constants
@@ -44,20 +44,22 @@ msgstr ""
 
 #. Translators: Label for the voice profiles listbox in the Select a voice dialog
 #. Translators: Label for the voice profiles listbox in the add-on settings
-#: addon\globalPlugins\voiceProfiles\selectVoiceProfileDialog.py:39
+#: addon\globalPlugins\voiceProfiles\selectVoiceProfileDialog.py:40
 #: addon\globalPlugins\voiceProfiles\settingsDialogs.py:49
 msgid "Voice profiles"
 msgstr ""
 
 #. Translators: Label for the OK button in the select a voice dialog
-#: addon\globalPlugins\voiceProfiles\selectVoiceProfileDialog.py:46
+#: addon\globalPlugins\voiceProfiles\selectVoiceProfileDialog.py:47
 msgid "OK"
 msgstr ""
 
 #. Translators: Label for the cancel button in the select voice dialog
-#. Translators: Label for the cancel button in the add voice dialog
-#: addon\globalPlugins\voiceProfiles\selectVoiceProfileDialog.py:51
-#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:158
+#. Translators: Label for the cancel button in the add voice profile dialog
+#. Translators: Label for the cancel button in the edit voice profile dialog
+#: addon\globalPlugins\voiceProfiles\selectVoiceProfileDialog.py:52
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:171
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:294
 msgid "Cancel"
 msgstr ""
 
@@ -70,43 +72,75 @@ msgid "Voice Profiles"
 msgstr ""
 
 #. Translators: Label for the add button in the add-on settings
-#. Translators: Label for the add button in the add voice dialog
+#. Translators: Label for the add button in the add voice profile dialog
 #: addon\globalPlugins\voiceProfiles\settingsDialogs.py:56
-#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:153
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:166
 msgid "Add"
 msgstr ""
 
-#. Translators: Label for the remove button in the add-on settings
+#. Translators: Label for the edit button in the add-on settings
 #: addon\globalPlugins\voiceProfiles\settingsDialogs.py:60
+msgid "Edit"
+msgstr ""
+
+#. Translators: Label for the remove button in the add-on settings
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:64
 msgid "Remove"
 msgstr ""
 
-#. Translators: Label for the update voice profile parameters when NVDA's own speech settings change checkbox in the add-on settings
-#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:67
-msgid "Update voice profile parameters when NVDA's own speech settings change"
+#. Translators: Label for the update voice when NVDA's own speech settings change checkbox in the add-on settings
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:71
+msgid "Update voice when NVDA's own speech settings change"
 msgstr ""
 
-#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:99
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:107
 msgid "The last remaining voice profile cannot be removed"
 msgstr ""
 
-#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:124
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:132
 msgid "Add a voice profile"
 msgstr ""
 
-#. Translators: Label for the synthesizers combobox in the add voice dialog
-#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:141
+#. Translators: Label for the synthesizers combobox in the add voice profile dialog
+#. Translators: Label for the synthesizers combobox in the edit voice profile dialog
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:149
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:267
 msgid "Synthesizer"
 msgstr ""
 
-#. Translators: Label for the voices combobox in the add voice dialog
-#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:147
+#. Translators: Label for the voices combobox in the add voice profile dialog
+#. Translators: Label for the voices combobox in the edit voice profile dialog
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:155
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:277
 msgid "Voice"
 msgstr ""
 
+#. Translators: Label for the profile name text field in the add voice profile dialog
+#. Translators: Label for the profile name text field in the edit voice profile dialog
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:159
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:281
+msgid "Profile name"
+msgstr ""
+
 #. Translators: Value of the voices combobox in the add voice dialog when no voices are available
-#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:185
+#. Translators: Value of the voices combobox in the edit voice dialog when no voices are available
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:206
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:333
 msgid "No voices available"
+msgstr ""
+
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:248
+msgid "Edit voice profile"
+msgstr ""
+
+#. Translators: Label for the save button in the edit voice profile dialog
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:289
+msgid "Save"
+msgstr ""
+
+#. Translators: Default profile name for unknown voice
+#: addon\globalPlugins\voiceProfiles\voiceProfiles.py:338
+msgid "Unknown"
 msgstr ""
 
 #. Add-on description

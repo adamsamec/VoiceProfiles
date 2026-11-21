@@ -1,0 +1,148 @@
+    # Voice Profiles - NVDA add-on for creating and easy switching of voice profiles.
+# Copyright (C) 2026 Adam Samec
+# This file is distributed under the same license as the 'voiceProfiles' package.
+# Adam Samec <adam.samec@gmail.com>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 'voiceProfiles' '1.0.0'\n"
+"POT-Creation-Date: 2026-11-21 11:58+0100\n"
+"PO-Revision-Date: 2026-11-21 11:58+0100\n"
+"Last-Translator: Adam Samec <adam.samec@gmail.com>\n"
+"Language-Team: Czech <adam.samec@gmail.com>\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Translators: Switch to the next voice profile gesture description for the Input gestures settings dialog
+#: addon\globalPlugins\voiceProfiles\__init__.py:35
+msgid "Switches to the next voice profile"
+msgstr "Přepne na následující hlasový profil"
+
+#. Translators: Switch to the previous voice profile gesture description for the Input gestures settings dialog
+#: addon\globalPlugins\voiceProfiles\__init__.py:43
+msgid "Switches to the previous voice profile"
+msgstr "Přepne na předchozí hlasový profil"
+
+#. Translators: Select a voice profile gesture description for the Input gestures settings dialog
+#: addon\globalPlugins\voiceProfiles\__init__.py:51
+msgid "Shows the dialog for selecting a voice profile"
+msgstr "Zobrazí dialog pro výběr hlasového profilu"
+
+#. Constants
+#. Translators: Label for the silence synthesizer in the voices listbox or synthesizers and voices comboboxes
+#: addon\globalPlugins\voiceProfiles\consts.py:10
+msgid "Silence"
+msgstr "Bez mluvení"
+
+#: addon\globalPlugins\voiceProfiles\selectVoiceProfileDialog.py:25
+msgid "Select a voice profile"
+msgstr "Vyberte hlasový profil"
+
+#. Translators: Label for the voice profiles listbox in the Select a voice dialog
+#. Translators: Label for the voice profiles listbox in the add-on settings
+#: addon\globalPlugins\voiceProfiles\selectVoiceProfileDialog.py:40
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:49
+msgid "Voice profiles"
+msgstr "Hlasové profily"
+
+#. Translators: Label for the OK button in the select a voice dialog
+#: addon\globalPlugins\voiceProfiles\selectVoiceProfileDialog.py:47
+msgid "OK"
+msgstr "OK"
+
+#. Translators: Label for the cancel button in the select voice dialog
+#. Translators: Label for the cancel button in the add voice profile dialog
+#. Translators: Label for the cancel button in the edit voice profile dialog
+#: addon\globalPlugins\voiceProfiles\selectVoiceProfileDialog.py:52
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:171
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:294
+msgid "Cancel"
+msgstr "Zrušit"
+
+#. Translators: Add-on settings panel title
+#. Add-on summary, usually the user visible name of the addon.
+#. Translators: Summary for this add-on
+#. to be shown on installation and add-on information found in Add-ons Manager.
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:21 buildVars.py:23
+msgid "Voice Profiles"
+msgstr "Voice Profiles"
+
+#. Translators: Label for the add button in the add-on settings
+#. Translators: Label for the add button in the add voice profile dialog
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:56
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:166
+msgid "Add"
+msgstr "Přidat"
+
+#. Translators: Label for the edit button in the add-on settings
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:60
+msgid "Edit"
+msgstr "Upravit"
+
+#. Translators: Label for the remove button in the add-on settings
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:64
+msgid "Remove"
+msgstr "Odstranit"
+
+#. Translators: Label for the update voice when NVDA's own speech settings change checkbox in the add-on settings
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:71
+msgid "Update voice when NVDA's own speech settings change"
+msgstr "Aktualizovat hlas při jeho změně přes nastavení řeči samotného NVDA"
+
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:107
+msgid "The last remaining voice profile cannot be removed"
+msgstr "Poslední zbývající hlasový profil nelze odstranit"
+
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:132
+msgid "Add a voice profile"
+msgstr "Přidat hlasový profil"
+
+#. Translators: Label for the synthesizers combobox in the add voice profile dialog
+#. Translators: Label for the synthesizers combobox in the edit voice profile dialog
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:149
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:267
+msgid "Synthesizer"
+msgstr "Hlasový výstup"
+
+#. Translators: Label for the voices combobox in the add voice profile dialog
+#. Translators: Label for the voices combobox in the edit voice profile dialog
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:155
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:277
+msgid "Voice"
+msgstr "Hlas"
+
+#. Translators: Label for the profile name text field in the add voice profile dialog
+#. Translators: Label for the profile name text field in the edit voice profile dialog
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:159
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:281
+msgid "Profile name"
+msgstr "Název profilu"
+
+#. Translators: Value of the voices combobox in the add voice dialog when no voices are available
+#. Translators: Value of the voices combobox in the edit voice dialog when no voices are available
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:206
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:333
+msgid "No voices available"
+msgstr "Žádné hlasy nejsou dostupné"
+
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:248
+msgid "Edit voice profile"
+msgstr "Upravit hlasový profil"
+
+#. Translators: Label for the save button in the edit voice profile dialog
+#: addon\globalPlugins\voiceProfiles\settingsDialogs.py:289
+msgid "Save"
+msgstr "Uložit"
+
+#. Translators: Default profile name for unknown voice
+#: addon\globalPlugins\voiceProfiles\voiceProfiles.py:338
+msgid "Unknown"
+msgstr "Neznámý"
+
+#. Add-on description
+#. Translators: Long description to be shown for this add-on on add-on information from add-ons manager
+#: buildVars.py:26
+msgid "Allows creation of voice profiles and easy switching between them."
+msgstr "Umožňuje vytváření hlasovýh profilů a snadné přepínání mezi nimi."
