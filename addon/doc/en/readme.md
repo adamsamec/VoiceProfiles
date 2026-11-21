@@ -4,7 +4,7 @@
 
 The Voice Profiles add-on for NVDA screen reader allows you to configure various voice profiles in its settings so that you can later quickly and easily switch between those profiles anytime either in forward or backward direction, or using the voice profile selection dialog.
 
-This add-on comes handy for example in case you need to easily switch between voices in different languages, or between voices for ordinary work and long reading where you might want to configure two or more profiles with different voice or speech rate.
+This add-on comes handy for example in case you need to easily switch between voices in different languages, or between voices for ordinary work and long reading where you might want to configure two or more profiles each with different voice or speech rate.
 
 ## Configuring voice profiles
 
@@ -20,6 +20,8 @@ The voice profiles to easily switch between can be preconfigured in the Voice Pr
 8. Navigate to the "Add" button and activate it. The just added voice profile will appear in the voice profiles list after the currently selected item in the list.
 9. Don't forgot to save the settings just made by pressing the "OK" or "Apply" button at the end of the NVDA settings dialog.
 
+If you want to edit an existing voice profile, such as change its synthesizer, voice or name, first select the voice profile in the list in the Voice Profile settings and then use the "Edit" button. The button opens a dialog analogous to that one for adding a new voice profile which has been described above.
+
 ## Switching to next or previous voice profile using shortcuts
 
 Let's say you speak English and French, then you can add two voice profiles in the Voice Profiles settings as described in the previous section, one using an English and the other using a French voice. Anytime later you can switch between those two voice profiles using only the NVDA + Control + L simple and comfortable keyboard shortcut instead of messing with the NVDA synth settings ring or the NVDA synthesizer selection dialog. If you configure mor than two voice profiles, you can also leverage the keyboard shortcut NVDA + Control + Shift + L for switching to the previous voice profile.
@@ -30,7 +32,7 @@ Especially in case you have configured mor than two voice profiles, you can take
 
 ## Other settings
 
-You can control whether changes of the current voice using the synth settings ring, select synthesizer dialog, or via the speech category of the NVDA settings dialog also accordingly update the voice profiles configured in the Voice Profiles settings. This can be controlled in the Voice Profiles settings using the "Update voice when NVDA's own speech settings change" checkbox.
+You can control whether changes of the current voice using the synth settings ring, select synthesizer dialog, or via the speech category of the NVDA settings dialog also accordingly update the voice set for the current voice profile. This can be controlled in the Voice Profiles settings using the "Update voice when NVDA's own speech settings change" checkbox.
 
 ## Remembering voice profiles for individual applications
 
@@ -65,8 +67,12 @@ The default NVDA + Control + L and NVDA + Control + Shift + L keyboard shortcuts
 
 If you have suggestions for the Voice Profiles add-on improvement, problems with its functionality, would like to provide a translation or have other comments, you can drop me an email to [adam.samec@gmail.com](mailto:adam.samec@gmail.com)
 
+You can also use the features of the [Voice Profiles add-on repository on GitHub][GitHub], for example its [issue reporting functionality][GitHub issues].
+
 ## License
 
 The Voice Profiles add-on is available under the GNU General Public License version 2.0.
 
 [changelog]: https://github.com/adamsamec/VoiceProfiles/blob/main/Changelog.md
+[GitHub]: https://github.com/adamsamec/VoiceProfiles
+[GitHub issues]: https://github.com/adamsamec/VoiceProfiles/issues
