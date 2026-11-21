@@ -32,7 +32,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	@scriptHandler.script(
 		gesture="kb:NVDA+Control+L",
 		# Translators: Switch to the next voice profile gesture description for the Input gestures settings dialog
-		description=_("Switches to the next voice profile."),
+		description=_("Switches to the next voice profile"),
 	)
 	def script_switchToNextVoiceProfile(self, gesture):
 		self.app.switchToNextVoiceProfile()
@@ -40,7 +40,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	@scriptHandler.script(
 		gesture="kb:NVDA+Control+Shift+L",
 		# Translators: Switch to the previous voice profile gesture description for the Input gestures settings dialog
-		description=_("Switches to the previous voice profile."),
+		description=_("Switches to the previous voice profile"),
 	)
 	def script_switchToPrevVoiceProfile(self, gesture):
 		self.app.switchToPrevVoiceProfile()
@@ -48,7 +48,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	@scriptHandler.script(
 		gesture="kb:NVDA+Alt+V",
 		# Translators: Select a voice profile gesture description for the Input gestures settings dialog
-		description=_("Shows the dialog for selecting a voice profile."),
+		description=_("Shows the dialog for selecting a voice profile"),
 	)
 	def script_showSelectVoiceProfileDialog(self, gesture):
 		self.app.showSelectVoiceProfileDialog()
